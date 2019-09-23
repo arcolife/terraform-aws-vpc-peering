@@ -1,15 +1,18 @@
 resource "aws_vpc_peering_connection" "default" {
   provider = "aws.src"
-  peer_vpc_id   = "${data.aws_vpc.peer_dst_vpc.id}"
-  vpc_id        = "${data.aws_vpc.peer_src_vpc.id}"
 
-  peer_region = "${data.aws_region.dst_vpc.name}"
+  count = length(local.peer_regions_list)
+  
+  peer_vpc_id   = local.peer_regions_list[count.index].acceptor_vpc_id
+  vpc_id        = local.peer_regions_list[count.index].requestor_vpc_id
+
+  peer_region = local.peer_regions_list[count.index].peer_region
 
   auto_accept = "${var.auto_accept}"
 
   tags = {
     # A bit opinionated here, but this will fail without a Name tag. Seems like a good practice to have anyhow.
-    Name    = "${data.aws_vpc.peer_src_vpc.tags["Name"]} to ${data.aws_vpc.peer_dst_vpc.tags["Name"]}"
+    Name    = "${local.peer_regions_list[count.index].deploy_region} to ${local.peer_regions_list[count.index].peer_region}"
     Comment = "Managed By Terraform"
   }
 }

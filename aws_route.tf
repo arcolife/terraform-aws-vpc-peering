@@ -7,7 +7,7 @@ resource "aws_route" "peer_src_to_peer_dst" {
 
   route_table_id            = "${element(var.peer_src_route_tables, count.index)}"
   destination_cidr_block    = "${data.aws_vpc.peer_dst_vpc.cidr_block}"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.default.id}"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.default[0].id}"
 }
 resource "aws_route" "peer_dst_to_peer_src" {
   provider = "aws.dst"
@@ -15,5 +15,5 @@ resource "aws_route" "peer_dst_to_peer_src" {
 
   route_table_id            = "${element(var.peer_dst_route_tables, count.index)}"
   destination_cidr_block    = "${data.aws_vpc.peer_src_vpc.cidr_block}"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.default.id}"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.default[0].id}"
 }
